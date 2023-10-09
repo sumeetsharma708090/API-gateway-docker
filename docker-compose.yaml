@@ -1,0 +1,60 @@
+version: "3"
+services:
+  ServiceRegistry:
+    image: ServiceRegistry
+    build: ./ServiceRegistry
+    ports:
+      - "8761:8761"
+    environment:
+        ELASTIC_APM_SECRET_TOKEN: "LYtoaASLSGfMduNJOL"
+        ELASTIC_APM_SERVER_URL: "https://c927b4346b8a46bfb634439f0a75572e.apm.us-central1.gcp.cloud.es.io:443"
+        ELASTIC_APM_LOG_LEVEL: "DEBUG"
+
+  ApiGateway:
+    image: ApiGateway
+    build: ./ApiGateway
+    ports:
+      - "3131:3333"
+    environment:
+        ELASTIC_APM_SECRET_TOKEN: "LYtoaASLSGfMduNJOL"
+        ELASTIC_APM_SERVER_URL: "https://c927b4346b8a46bfb634439f0a75572e.apm.us-central1.gcp.cloud.es.io:443"
+        ELASTIC_APM_LOG_LEVEL: "DEBUG"
+
+  DepartmentService:
+    image: DepartmentService
+    build: ./DepartmentService
+    ports:
+      - "1515:1111"
+    environment:
+        SPRING_DATASOURCE_URL: "jdbc:mysql://mysqldb:3306/depart?createDatabaseIfNotExist=true"
+        SPRING_DATASOURCE_USERNAME: "root"
+        SPRING_DATASOURCE_PASSWORD: "root"
+        ELASTIC_APM_SECRET_TOKEN: "LYtoaASLSGfMduNJOL"
+        ELASTIC_APM_SERVER_URL: "https://c927b4346b8a46bfb634439f0a75572e.apm.us-central1.gcp.cloud.es.io:443"
+        ELASTIC_APM_LOG_LEVEL: "DEBUG"
+    depends_on:
+      - mysqldb
+
+  UserService:
+    image: UserService
+    build: ./UserService
+    ports:
+      - "2121:2222"
+    environment:
+        SPRING_DATASOURCE_URL: "jdbc:mysql://mysqldb:3306/users?createDatabaseIfNotExist=true"
+        SPRING_DATASOURCE_USERNAME: "root"
+        SPRING_DATASOURCE_PASSWORD: "root"
+        ELASTIC_APM_SECRET_TOKEN: "LYtoaASLSGfMduNJOL"
+        ELASTIC_APM_SERVER_URL: "https://c927b4346b8a46bfb634439f0a75572e.apm.us-central1.gcp.cloud.es.io:443"
+        ELASTIC_APM_LOG_LEVEL: "DEBUG"
+    depends_on:
+      - mysqldb
+      - DepartmentService
+
+  mysqldb:
+    image: mysql:8
+    ports:
+      - "3308:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=zservices
